@@ -2,7 +2,6 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Logger,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -21,8 +20,6 @@ import { assertLanguageCode } from '../common/language/language';
 @Controller('speech/assessment')
 @UseInterceptors(ClassSerializerInterceptor)
 export class SpeechAssessmentController {
-  private readonly logger = new Logger('SpeechAssessmentController');
-
   constructor(private readonly service: SpeechAssessmentService) {}
 
   @Post()
@@ -36,7 +33,7 @@ export class SpeechAssessmentController {
     body: CreateSpeechAssessmentRequest,
     @UploadedFile() audioFile: Express.Multer.File,
   ): Promise<SpeechAssessment> {
-    return this.service.assessSpeech({
+    return this.service.createSpeechAssessment({
       referenceText: body.referenceText,
       recording: {
         content: audioFile.buffer.toString('base64'),

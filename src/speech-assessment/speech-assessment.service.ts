@@ -1,34 +1,33 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as WinkTokenizer from 'wink-tokenizer';
-import { Token } from 'wink-tokenizer';
 import { createAligner } from 'align-arr';
 import { TranscriptionService } from '../transcription/transcription.service';
 import {
   CreateSpeechAssessmentRequest,
-  ReferenceWord,
   ScoredWord,
-  SpeechAssessment,
   ScoredWordResult,
+  SpeechAssessment,
   SpeechAssessmentResult,
 } from './speech-assessment.service.types';
+import { capNum } from '../common/utils/number-utils';
+import { Tokenizer } from '../common/tokenizer/tokenizer';
 
 @Injectable()
 export class SpeechAssessmentService {
   private readonly logger = new Logger(SpeechAssessmentService.name);
-  private readonly tokenizer = new WinkTokenizer();
+  private readonly tokenizer = new Tokenizer();
   private readonly aligner = createAligner({
     equals: (s, t) => s.word.toLowerCase() === t.word.toLowerCase(),
   });
 
   constructor(private readonly transcriber: TranscriptionService) {}
 
-  public async assessSpeech(
+  public async createSpeechAssessment(
     request: CreateSpeechAssessmentRequest,
   ): Promise<SpeechAssessment> {
     this.logger.log('assessSpeech started');
-    const referenceTokens = this.tokenize(request.referenceText).filter(
-      (t) => t.tag === 'word',
-    );
+    const referenceTokens = this.tokenizer
+      .tokenize(request.referenceText)
+      .filter((t) => t.tag === 'word');
     const boostWords = referenceTokens.map((t) => t.word);
     const transcriptions = await this.transcriber.transcribe({
       recording: request.recording,
@@ -81,38 +80,4 @@ export class SpeechAssessmentService {
       scoredWords: words,
     };
   }
-
-  private tokenize(text: string): ReferenceWord[] {
-    const tokens = this.tokenizer.tokenize(text);
-    const bounds = getBounds(text, tokens);
-    return tokens.map((t, i) => ({
-      word: t.value,
-      tag: t.tag,
-      charStart: bounds[i].charStart,
-      charEnd: bounds[i].charEnd,
-    }));
-  }
 }
-
-const capNum = (num: number): number => {
-  return Math.floor(num * 100) / 100;
-};
-
-const getBounds = (
-  referenceText: string,
-  referenceWords: Token[],
-): { charStart: number; charEnd: number }[] => {
-  // for each word, get position in text
-  const bounds = [];
-  let charStart = 0;
-  for (const word of referenceWords) {
-    charStart = referenceText.indexOf(word.value, charStart);
-    if (charStart < 0) {
-      break; // fail all
-    }
-    const charEnd = charStart + word.value.length;
-    bounds.push({ charStart, charEnd });
-    charStart = charEnd;
-  }
-  return bounds;
-};
