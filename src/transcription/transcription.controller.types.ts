@@ -1,4 +1,4 @@
-import { LanguageCode } from '../language/languages';
+import { LanguageCode } from '../common/language/language';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RecognizedWord {

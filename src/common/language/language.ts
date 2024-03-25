@@ -2,7 +2,7 @@ export type LanguageCode = string;
 
 export const languageCodes = ['en', 'it', 'sp', 'ru'];
 
-export const getLanguageCode = (name: string): LanguageCode => {
+export const assertLanguageCode = (name: string): LanguageCode => {
   if (languageCodes.find((code) => code === name)?.length > 0) {
     return name;
   } else {

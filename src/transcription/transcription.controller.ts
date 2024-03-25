@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { getLanguageCode } from '../language/languages';
+import { assertLanguageCode } from '../common/language/language';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { TranscriptionService } from './transcription.service';
 import {
@@ -42,7 +42,7 @@ export class TranscriptionController {
         sampleRate: body.sampleRate,
       },
       boostWords: body.boostWords,
-      language: getLanguageCode(body.language),
+      language: assertLanguageCode(body.language),
     });
   }
 }

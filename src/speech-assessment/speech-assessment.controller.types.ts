@@ -9,20 +9,6 @@ export class CreateSpeechAssessmentRequest {
   language: string;
 }
 
-export class ReferenceWord {
-  @ApiProperty()
-  word: string;
-  @ApiProperty()
-  charStart: number;
-  @ApiProperty()
-  charEnd: number;
-}
-
-export class RecognizedWord {
-  @ApiProperty()
-  word: string;
-}
-
 export class ScoredWord {
   @ApiProperty()
   word: string;

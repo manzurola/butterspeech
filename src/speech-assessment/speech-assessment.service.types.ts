@@ -1,4 +1,4 @@
-import { LanguageCode } from '../language/languages';
+import { LanguageCode } from '../common/language/language';
 
 export interface ScoredWord {
   word: string;

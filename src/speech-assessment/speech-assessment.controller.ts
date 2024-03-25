@@ -10,12 +10,12 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { SpeechAssessmentService } from './speech-assessment.service';
-import { getLanguageCode } from '../language/languages';
 import {
   CreateSpeechAssessmentRequest,
   SpeechAssessment,
 } from './speech-assessment.controller.types';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { assertLanguageCode } from '../common/language/language';
 
 @ApiTags('speech/assessment')
 @Controller('speech/assessment')
@@ -42,7 +42,7 @@ export class SpeechAssessmentController {
         content: audioFile.buffer.toString('base64'),
         sampleRate: body.sampleRate,
       },
-      language: getLanguageCode(body.language),
+      language: assertLanguageCode(body.language),
     });
   }
 }
