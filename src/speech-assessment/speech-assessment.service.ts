@@ -8,7 +8,8 @@ import {
   ReferenceWord,
   ScoredWord,
   SpeechAssessment,
-  WordResult,
+  ScoredWordResult,
+  SpeechAssessmentResult,
 } from './speech-assessment.service.types';
 
 @Injectable()
@@ -39,43 +40,45 @@ export class SpeechAssessmentService {
     const alignment = this.aligner.align(recognizedWords, referenceTokens);
     const words: ScoredWord[] = alignment
       .filter((e) => e.operation !== 'delete')
+      .filter((e) => e.operation !== 'insert')
       .map((e) => {
-        const source = e.source.data;
-        const target = e.target.data;
-        const pronunciation = capNum(source?.confidence || 0.0);
-        let result: WordResult = 'equal';
+        const recognizedWord = e.source.data;
+        const referenceWord = e.target.data;
+        const score = capNum(recognizedWord?.confidence || 0.0);
+        let result: ScoredWordResult = 'Green';
         if (e.target.data?.tag !== 'word') {
-          result = 'non-word';
-        } else if (e.operation === 'equal' && pronunciation < 0.85) {
-          result = 'mispronunciation';
+          result = 'Black';
+        } else if (e.operation === 'equal' && score < 0.85) {
+          result = 'Orange';
         } else if (e.operation === 'substitute') {
-          result = 'mispronunciation';
-        } else if (e.operation === 'insert') {
-          result = 'missing';
+          result = 'Red';
         }
+
         return {
-          score: capNum(source?.confidence || 0.0),
-          recognized: !!source ? { ...source } : undefined,
-          reference: !!target ? { ...target } : undefined,
+          score: capNum(recognizedWord?.confidence || 0.0),
           result,
+          word: referenceWord.word,
+          charOffsetStart: referenceWord.charStart,
+          charOffsetEnd: referenceWord.charEnd,
+          recognizedWord: recognizedWord.word,
         };
       });
-    const score = capNum(
-      words
-        .filter(({ result }) => result !== 'non-word')
-        .filter(({ result }) => result !== 'unnecessary')
-        .map(({ score }) => score)
-        .reduce((a, b) => a + b, 0) / words.length,
+    const totalScore = capNum(
+      words.map(({ score }) => score).reduce((a, b) => a + b, 0) / words.length,
     );
 
     this.logger.log('Speech assessment complete', {
-      score,
+      score: totalScore,
       words,
     });
 
+    const finalResult: SpeechAssessmentResult =
+      totalScore > 0.6 ? 'Success' : 'Fail';
+
     return {
-      score,
-      words,
+      result: finalResult,
+      score: totalScore,
+      scoredWords: words,
     };
   }
 

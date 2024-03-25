@@ -27,7 +27,7 @@ export class TranscriptionController {
 
   @Post()
   @ApiCreatedResponse({
-    description: 'Speech assessment successfully created.',
+    description: 'Transcription created.',
     type: [Transcription],
   })
   @UseInterceptors(FileInterceptor('audioFile'))
