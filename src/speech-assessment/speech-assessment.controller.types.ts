@@ -9,34 +9,26 @@ export class CreateSpeechAssessmentRequest {
   language: string;
 }
 
-export class ReferenceWord {
-  @ApiProperty()
-  word: string;
-  @ApiProperty()
-  charStart: number;
-  @ApiProperty()
-  charEnd: number;
-}
-
-export class RecognizedWord {
-  @ApiProperty()
-  word: string;
-}
-
 export class ScoredWord {
   @ApiProperty()
-  result: string;
+  word: string;
+  @ApiProperty()
+  recognizedWord: string;
+  @ApiProperty()
+  charOffsetStart: number;
+  @ApiProperty()
+  charOffsetEnd: number;
+  @ApiProperty()
+  result: 'Red' | 'Orange' | 'Green' | 'Black';
   @ApiProperty()
   score: number;
-  @ApiProperty({ type: ReferenceWord })
-  reference: ReferenceWord;
-  @ApiProperty({ type: RecognizedWord, required: false })
-  recognized?: RecognizedWord;
 }
 
 export class SpeechAssessment {
   @ApiProperty()
+  result: 'Success' | 'Fail' | 'Incomprehensible';
+  @ApiProperty()
   score: number;
   @ApiProperty({ type: [ScoredWord] })
-  words: ScoredWord[];
+  scoredWords: ScoredWord[];
 }

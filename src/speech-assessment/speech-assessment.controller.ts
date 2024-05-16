@@ -2,7 +2,6 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Logger,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -10,19 +9,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { SpeechAssessmentService } from './speech-assessment.service';
-import { getLanguageCode } from '../language/languages';
 import {
   CreateSpeechAssessmentRequest,
   SpeechAssessment,
 } from './speech-assessment.controller.types';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { assertLanguageCode } from '../common/language/language';
 
 @ApiTags('speech/assessment')
 @Controller('speech/assessment')
 @UseInterceptors(ClassSerializerInterceptor)
 export class SpeechAssessmentController {
-  private readonly logger = new Logger('SpeechAssessmentController');
-
   constructor(private readonly service: SpeechAssessmentService) {}
 
   @Post()
@@ -36,13 +33,13 @@ export class SpeechAssessmentController {
     body: CreateSpeechAssessmentRequest,
     @UploadedFile() audioFile: Express.Multer.File,
   ): Promise<SpeechAssessment> {
-    return this.service.assessSpeech({
+    return this.service.createSpeechAssessment({
       referenceText: body.referenceText,
       recording: {
         content: audioFile.buffer.toString('base64'),
         sampleRate: body.sampleRate,
       },
-      language: getLanguageCode(body.language),
+      language: assertLanguageCode(body.language),
     });
   }
 }

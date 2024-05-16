@@ -1,30 +1,28 @@
-import { LanguageCode } from '../language/languages';
+import { LanguageCode } from '../common/language/language';
 
 export interface ScoredWord {
-  result: WordResult;
+  word: string;
+  recognizedWord: string;
+  charOffsetStart: number;
+  charOffsetEnd: number;
+  result: ScoredWordResult;
   score: number;
-  reference: ReferenceWord;
-  recognized?: RecognizedWord;
 }
 
 export interface SpeechAssessment {
+  result: SpeechAssessmentResult;
   score: number;
-  words: ScoredWord[];
+  scoredWords: ScoredWord[];
 }
 
-export type AssessmentResult = '';
+export type SpeechAssessmentResult = 'Success' | 'Fail';
 
 export interface AudioContent {
   sampleRate: number;
   content: string;
 }
 
-export type WordResult =
-  | 'equal'
-  | 'missing'
-  | 'unnecessary'
-  | 'mispronunciation'
-  | 'non-word';
+export type ScoredWordResult = 'Red' | 'Orange' | 'Green' | 'Black';
 
 export interface ReferenceWord {
   word: string;

@@ -1,5 +1,5 @@
 import { Recording } from '../speech-assessment/speech-assessment.service.types';
-import { LanguageCode } from '../language/languages';
+import { LanguageCode } from '../common/language/language';
 
 export interface TranscriptionRequest {
   recording: Recording;
